@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payroll Dashboard</title>
+    <style>
+        
+
+        .form-container, .result-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .form-container label, .result-container span {
+            min-width: 10px;
+        }
+
+        .result-values-horizontal {
+            display: flex;
+            gap: 20px;
+        }
+        .center, .container, .result-container{
+            display: flex;
+            justify-content: center;
+
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+    <h1>Payroll Dashboard</h1>
+</div>
+    <div class="container">
+        <div class="form-container">
+            <label for="emp_no">Emp No:</label>
+            <select name="emp_no" id="emp_no">
+                <option value="">Select Employee</option>
+                {% for employee in employees %}
+                    <option value="{{ employee.emp_no }}">{{ employee.emp_no }}</option>
+                {% endfor %}
+            </select>
+            <label for="month">Month:</label>
+            <select name="month" id="month">
+                <option value="">Select Month</option>
+                {% for month in months %}
+                    <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+        <div id="result" class="result-container" style="display: none;">
+            <span>Gross Pay:</span>
+            <span id="gross_pay"></span>
+            <pre>   </pre><span>Net Pay:</span>
+            <span id="net_pay"></span>
+        </div>
+    
+
+
+    <script>
+        // Function to update result based on selected values
+        function updateResult() {
+            var empNo = document.getElementById('emp_no').value;
+            var month = document.getElementById('month').value;
+
+            // AJAX request to fetch payroll data
+            fetch(`/api/payroll/${empNo}/${month}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update result if data is available
+                    if (data) {
+                        document.getElementById('gross_pay').textContent = data.gross_pay;
+                        document.getElementById('net_pay').textContent = data.net_pay;
+                        document.getElementById('result').style.display = 'flex';
+                    } else {
+                        // Hide result if no data available
+                        document.getElementById('result').style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Attach change event listeners to select fields
+        document.getElementById('emp_no').addEventListener('change', updateResult);
+        document.getElementById('month').addEventListener('change', updateResult);
+    </script>
+</body>
+</html>
